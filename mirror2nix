@@ -1,0 +1,53 @@
+#!/usr/bin/env ruby
+#
+# Transforms the existing mirror
+#
+
+require 'yaml'
+require 'json'
+
+gems = []
+
+Dir[File.expand_path('../mirror/gems/*.gem', __FILE__)].sort.each do |gem_path|
+  gem_name = File.basename(gem_path, '.gem')
+  # FIXME: avoid shell-out
+  gem_spec = YAML.load(`gem specification #{gem_path}`)
+  next unless gem_spec
+
+  gem_hash = `nix-hash --base32 --type sha256 "#{gem_path}"`.strip
+
+  nix = {
+    gemName: gem_name,
+    version: gem_spec.version.to_s,
+    sha256: gem_hash,
+
+    meta: {
+      description: gem_spec.description,
+      homepage: gem_spec.homepage,
+      license: gem_spec.license,
+    }
+  }
+
+  File.write("gems/#{gem_name}.json", JSON.pretty_generate(nix))
+
+  puts gem_name
+  gems << gem_name
+end
+
+HEADER = <<HEADER
+let
+  importJSON = path:
+    builting.fromJSON (builtins.readFile path);
+in;
+{
+HEADER
+
+File.open('default.nix', 'w') do |f|
+  f.puts HEADER
+  
+  gems.sort.each do |gem_name|
+    puts "  #{gem_name} = importJSON ./gems/#{gem_name}.json;"
+  end
+
+  f.puts "}"
+end

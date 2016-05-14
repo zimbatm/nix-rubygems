@@ -1,0 +1,12 @@
+#!/bin/sh -e
+
+cd "$(dirname "$0")"
+
+puts "***** Synching rubygems.org *****"
+
+gem mirror
+
+puts "***** Generating nix expressions *****"
+
+./mirror2nix
+

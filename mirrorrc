@@ -1,0 +1,7 @@
+---
+- from: http://rubygems.org
+  to: ~/code/github.com/zimbatm/rubygems2nix/mirror
+  parallelism: 10
+  retries: 3
+  delete: false 
+  skiperror: true
