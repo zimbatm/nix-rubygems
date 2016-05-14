@@ -5,13 +5,13 @@
 
 require 'yaml'
 require 'json'
+require 'rubygems/package'
 
 gems = []
 
 Dir[File.expand_path('../mirror/gems/*.gem', __FILE__)].sort.each do |gem_path|
   gem_name = File.basename(gem_path, '.gem')
-  # FIXME: avoid shell-out
-  gem_spec = YAML.load(`gem specification #{gem_path}`)
+  gem_spec =  Gem::Package.new(gem_path).spec rescue nil
   next unless gem_spec
 
   gem_hash = `nix-hash --base32 --type sha256 "#{gem_path}"`.strip
