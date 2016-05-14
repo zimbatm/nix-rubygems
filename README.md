@@ -39,6 +39,20 @@ bundle
 ./update
 ```
 
+## Projection
+
+For 1400 gems we have:
+* 1.2G ./mirror
+* 5.6M ./gems
+* 76K  ./default.nix
+* 760K ./.git/
+
+For 800k we will have ~:
+* 688G ./mirror
+* 3.2G ./gems
+* 44M  ./default.nix
+* 440M ./.git
+
 ## TODO
 
 * Actually convert the data to nix
