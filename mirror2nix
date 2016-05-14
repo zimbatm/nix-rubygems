@@ -11,8 +11,18 @@ gems = []
 
 Dir[File.expand_path('../mirror/gems/*.gem', __FILE__)].sort.each do |gem_path|
   gem_name = File.basename(gem_path, '.gem')
-  gem_spec =  Gem::Package.new(gem_path).spec rescue nil
-  next unless gem_spec
+  nix_path = "gems/#{gem_name}.json"
+
+  if File.exist? nix_path
+    gems << gem_name
+    next
+  end
+
+  gem_spec = Gem::Package.new(gem_path).spec rescue nil
+  unless gem_spec
+    # ignore broken gems
+    next
+  end
 
   gem_hash = `nix-hash --base32 --type sha256 "#{gem_path}"`.strip
 
@@ -28,17 +38,14 @@ Dir[File.expand_path('../mirror/gems/*.gem', __FILE__)].sort.each do |gem_path|
     }
   }
 
-  File.write("gems/#{gem_name}.json", JSON.pretty_generate(nix))
+  File.write(nix_path, JSON.pretty_generate(nix))
 
   puts gem_name
   gems << gem_name
 end
 
 HEADER = <<HEADER
-let
-  importJSON = path:
-    builting.fromJSON (builtins.readFile path);
-in;
+# Generated index of all the gems
 {
 HEADER
 
@@ -46,7 +53,7 @@ File.open('default.nix', 'w') do |f|
   f.puts HEADER
   
   gems.sort.each do |gem_name|
-    puts "  #{gem_name} = importJSON ./gems/#{gem_name}.json;"
+    f.puts "  #{gem_name.inspect} = ./gems/#{gem_name}.json;"
   end
 
   f.puts "}"
