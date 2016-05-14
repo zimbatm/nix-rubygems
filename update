@@ -2,11 +2,11 @@
 
 cd "$(dirname "$0")"
 
-puts "***** Synching rubygems.org *****"
+echo "***** Synching rubygems.org *****"
 
 gem mirror
 
-puts "***** Generating nix expressions *****"
+echo "***** Generating nix expressions *****"
 
 ./mirror2nix
 
