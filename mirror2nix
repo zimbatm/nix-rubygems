@@ -8,20 +8,19 @@ require 'json'
 require 'rubygems/package'
 require 'yaml'
 
-gems = []
-
 Dir[File.expand_path('../mirror/gems/*.gem', __FILE__)].sort.each do |gem_path|
-  gem_name = File.basename(gem_path, '.gem')
-  gem_spec = Gem::Package.new(gem_path).spec rescue nil
-  unless gem_spec
+  #gem_name = File.basename(gem_path, '.gem')
+  spec = Gem::Package.new(gem_path).spec rescue nil
+  unless spec
     # ignore broken gems
     next
   end
 
+  postfix = spec.platform == "ruby" ? "" : "-#{spec.platform}"
   nix_path =
-    "gems/#{gem_spec.name[0]}/#{gem_spec.name}/#{gem_spec.version}.json"
+    "gems/#{spec.name[0]}/#{spec.name}/#{spec.version}#{postfix}.json"
   if File.exist? nix_path
-    gems << gem_name
+    # already done
     next
   end
 
@@ -31,14 +30,14 @@ Dir[File.expand_path('../mirror/gems/*.gem', __FILE__)].sort.each do |gem_path|
     sha256: gem_hash,
 
     meta: {
-      description: gem_spec.description,
-      homepage: gem_spec.homepage,
-      license: gem_spec.license,
+      description: spec.description,
+      homepage: spec.homepage,
+      license: spec.license,
     }
   }
 
   FileUtils.mkdir_p File.dirname(nix_path)
   File.write(nix_path, JSON.pretty_generate(nix))
 
-  puts gem_name
+  puts nix_path
 end

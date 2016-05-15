@@ -13,7 +13,7 @@ let
     rev = "...";
     sha256 = "...";
   };
-  rdoc = buildRubyGem (rubygems "rdoc" "4.2.1");
+  rdoc = buildRubyGem (rubygems { name = "rdoc"; version = "4.2.1"; });
 in
   rdoc
 ```
