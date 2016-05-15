@@ -1,4 +1,4 @@
-{ name, version, platform ? "ruby" }:
+{ gemName, version, platform ? "ruby", ... }@args:
 let
   root = toString ./.;
   prefix = builtins.substring 0 1 name;
@@ -10,4 +10,4 @@ let
     else
       throw "gem ${name}-${version} not found";
 in
-  json // { gemName = name; inherit version platform; }
+  args // json
