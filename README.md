@@ -41,7 +41,8 @@ bundle
 
 ## Projection
 
-Total gems: 812788
+* Latest gems: 7539
+* Total gems: 812788
 
 For 1400 gems we have:
 * 1.2G ./mirror
