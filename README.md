@@ -41,15 +41,21 @@ bundle
 
 ## Projection
 
+Total gems: 812788
+
 For 1400 gems we have:
 * 1.2G ./mirror
 * 5.6M ./gems
 * 760K ./.git/
 
-For 800k we will have ~:
+For 800k gems we will have ~:
 * 688G ./mirror
 * 3.2G ./gems
 * 440M ./.git
+
+* 39M  Just the base32 sha256 hashes (52B)
+* 24M  Just the sha256 hashes (32B each)
+* TODO: add the folder and filename to the cost
 
 ## TODO
 
