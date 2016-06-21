@@ -23,7 +23,7 @@ class Mirror
   def update
     # TODO: use the latest enpoint and fallback on the full sync
     # TODO: only sync if the spec files have changed or the sync is not full
-    puts 'Fetching specs'
+    puts "Fetching specs. #{Time.now}"
     update_specs
     gems = load_gems_from_specs
     gems.each.with_index do |gem, i|
@@ -100,7 +100,8 @@ class Mirror
   def gemhash(gem)
     name, ver, plat = *gem
     file = "#{ver}#{"-#{plat}" unless plat == RUBY}.sha256"
-    to('gems', name[0,2], name, file)
+    split = name[0]
+    to('gems', split, name, file)
   end
 
   def gemname(gem)
