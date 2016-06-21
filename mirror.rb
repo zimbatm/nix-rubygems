@@ -1,3 +1,4 @@
+#!/usr/bin/env ruby
 require 'fileutils'
 
 class Mirror
@@ -22,21 +23,21 @@ class Mirror
   def update
     # TODO: use the latest enpoint and fallback on the full sync
     # TODO: only sync if the spec files have changed or the sync is not full
-    puts "Fetching specs"
+    puts 'Fetching specs'
     update_specs
     gems = load_gems_from_specs
     gems.each.with_index do |gem, i|
-      printf "[% 6d/% 6d] %-40s: ", i, gems.size, gemname(gem)
+      printf '[% 6d/% 6d] %-40s: ', i, gems.size, gemname(gem)
       file = gemhash(gem)
       if File.exists?(file)
-        puts "Existing"
+        puts 'Existing'
         next
       end
       url = gemurl(gem)
 
       sha256 = get_gem_hash(url)
       if sha256.empty?
-        puts "Missing sha256"
+        puts 'Missing sha256'
       else
         FileUtils.mkdir_p(File.dirname(file))
         begin
@@ -45,7 +46,7 @@ class Mirror
           # make sure the file is not created empty or half-written
           File.unlink(file) rescue nil
         end
-        puts "Added"
+        puts 'Added'
       end
     end
   end
@@ -77,13 +78,13 @@ class Mirror
 
   def fetch(from, to)
     FileUtils.mkdir_p(File.dirname(to))
-    if !system(CURL, "--fail", "--show-error", "--location", "--retry", "5", "--output", to, from)
+    if !system(CURL, '--fail', '--show-error', '--location', '--retry', '5', '--output', to, from)
       raise "Unable to fetch #{from(sfz)}"
     end
   end
 
   def work(*args)
-    to("mirror", *args)
+    to('mirror', *args)
   end
 
   def load_gems_from_specs
@@ -98,16 +99,23 @@ class Mirror
 
   def gemhash(gem)
     name = gem.first
-    to("gems", name[0,2], gemname(gem, ext: ".sha256"))
+    to('gems', name[0,2], name, gemname(gem) + '.sha256')
   end
 
-  def gemname(gem, ext: ".gem")
+  def gemname(gem)
     name, ver, plat = *gem
     # If the platform is ruby, it is not in the gem name
-    "#{name}-#{ver}#{"-#{plat}" unless plat == RUBY}#{ext}"
+    "#{name}-#{ver}#{"-#{plat}" unless plat == RUBY}"
   end
 
   def gemurl(gem)
-    from('gems', gemname(gem))
+    from('gems', gemname(gem) + '.gem')
   end
+end
+
+if __FILE__ == $0
+  top = File.expand_path(__dir__)
+
+  m = Mirror.new(top)
+  m.update
 end

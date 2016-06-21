@@ -25,7 +25,7 @@ Depends on `ruby` (no gem deps), `curl` and `nix-prefetch-url`
 ```sh
 git clone https://github.com/zimbatm/nix-rubygems.git
 cd nix-rubygems
-./update
+./mirror.rb
 ```
 
 ## Projection
