@@ -1,12 +1,13 @@
-#!/bin/sh -e
+#!/usr/bin/env ruby
+#
+# Transforms the existing mirror
+#
 
-cd "$(dirname "$0")"
+top = File.expand_path(__dir__)
 
-echo "***** Synching rubygems.org *****"
+$:.unshift File.join(top, 'lib')
+require 'mirror'
 
-gem mirror
-
-echo "***** Generating nix expressions *****"
-
-./mirror2nix
+m = Mirror.new(top)
+m.update
 

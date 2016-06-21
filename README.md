@@ -1,6 +1,6 @@
-# rubygems2nix
+# nix-rubygems
 
-Package metadata repository for nix.
+Contains all rubygems hashes.
 
 The idea is that you will be able to do something like this in nix:
 
@@ -9,7 +9,7 @@ The idea is that you will be able to do something like this in nix:
 let
   rubygems = fetchFromGitHub {
     owner = "zimbatm";
-    repo = "rubygems2nix";
+    repo = "nix-rubygems";
     rev = "...";
     sha256 = "...";
   };
@@ -18,28 +18,20 @@ in
   rdoc
 ```
 
-Based on [rubygems-mirror](https://github.com/rubygems/rubygems-mirror)
+## Run your own
 
-## Setup
-
-```sh
-repo_dir=$HOME/code/github.com/zimbatm/rubygems2nix
-mkdir -p "$(dirname "$repo_dir")"
-cd "$(dirname "$repo_dir")"
-git clone https://github.com/zimbatm/rubygems2nix.git
-cd rubygems2nix
-
-ln -s "$repo_dir/mirrorrc" ~/.gem/.mirrorrc
-bundle
-```
-
-## Usage
+Depends on `ruby` (no gem deps), `curl` and `nix-prefetch-url`
 
 ```sh
+git clone https://github.com/zimbatm/nix-rubygems.git
+cd nix-rubygems
 ./update
 ```
 
 ## Projection
+
+These are some calculations made if we where to include more informations
+about the gems (like the metadata):
 
 * Latest gems: 7539
 * Total gems: 812788
@@ -57,8 +49,4 @@ For 800k gems we will have ~:
 * 39M  Just the base32 sha256 hashes (52B)
 * 24M  Just the sha256 hashes (32B each)
 * TODO: add the folder and filename to the cost
-
-## TODO
-
-* Actually convert the data to nix
 
