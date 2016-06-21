@@ -98,8 +98,9 @@ class Mirror
   end
 
   def gemhash(gem)
-    name = gem.first
-    to('gems', name[0,2], name, gemname(gem) + '.sha256')
+    name, ver, plat = *gem
+    file = "#{ver}#{"-#{plat}" unless plat == RUBY}.sha256"
+    to('gems', name[0,2], name, file)
   end
 
   def gemname(gem)
