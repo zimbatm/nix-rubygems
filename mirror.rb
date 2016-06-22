@@ -15,9 +15,10 @@ class Mirror
   NIX_PREFETCH_URL = 'nix-prefetch-url'
   CURL = 'curl'
 
-  def initialize(to_dir, retries: 5)
+  def initialize(to_dir, hook, retries: 5)
     @from = DEFAULT_URI
     @to = to_dir
+    @hook = hook
   end
 
   def update
@@ -26,6 +27,8 @@ class Mirror
     puts "Fetching specs. #{Time.now}"
     update_specs
     gems = load_gems_from_specs
+    added = 0
+    missing = 0
     gems.each.with_index do |gem, i|
       printf '[% 6d/% 6d] %-40s: ', i, gems.size, gemname(gem)
       file = gemhash(gem)
@@ -38,6 +41,7 @@ class Mirror
       sha256 = get_gem_hash(url)
       if sha256.empty?
         puts 'Missing sha256'
+        missing += 1
       else
         FileUtils.mkdir_p(File.dirname(file))
         begin
@@ -47,11 +51,24 @@ class Mirror
           File.unlink(file) rescue nil
         end
         puts 'Added'
+        added += 1
+        if added % 1000 == 0
+          run_hook(i, gems.size, added, missing)
+        end
       end
     end
   end
 
   private
+
+  def run_hook(i, count, added, missing)
+    return if @hook.to_s.empty?
+    ENV['GEM_INDEX'] = i
+    ENV['GEM_COUNT'] = count
+    ENV['GEM_ADDED'] = added
+    ENV['GEM_MISSING'] = missing
+    system(@hook, to('gems'))
+  end
 
   def get_gem_hash(url)
     `#{NIX_PREFETCH_URL} --type sha256 "#{url}" 2>/dev/null`.strip
@@ -116,8 +133,9 @@ class Mirror
 end
 
 if __FILE__ == $0
+  hook = ARGV[0]
   top = File.expand_path(__dir__)
 
-  m = Mirror.new(top)
+  m = Mirror.new(top, hook)
   m.update
 end
