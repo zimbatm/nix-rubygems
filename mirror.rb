@@ -63,10 +63,10 @@ class Mirror
 
   def run_hook(i, count, added, missing)
     return if @hook.to_s.empty?
-    ENV['GEM_INDEX'] = i
-    ENV['GEM_COUNT'] = count
-    ENV['GEM_ADDED'] = added
-    ENV['GEM_MISSING'] = missing
+    ENV['GEM_INDEX'] = i.to_s
+    ENV['GEM_COUNT'] = count.to_s
+    ENV['GEM_ADDED'] = added.to_s
+    ENV['GEM_MISSING'] = missing.to_s
     system(@hook, to('gems'))
   end
 
